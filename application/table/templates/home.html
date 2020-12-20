@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+        <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+        <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <center>
+                <img class="d-block w-75" src="static/pics/AJEDETEJBYL/carousel1_logo.png" alt="First slide">
+            </center>
+            <div class="carousel-caption d-none d-md-block">
+                <h1>I AM THE TABLE</h1>
+                <h3>Not just another To Do App</h3>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <center>
+                <img class="d-block w-75" src="static/pics/AJEDETEJBYL/carousel2_tables.png" alt="Second slide">
+            </center>
+            <div class="carousel-caption d-none d-md-block">
+                <h2>Use it as your own customizable Task Manager</h2>
+                <h3>Or make your own data's table and store them in Panda's DataFrames</h3>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <center>
+                <img class="d-block w-75" src="static/pics/AJEDETEJBYL/carousel3_graphs.png" alt="Third slide">
+            </center>
+            <div class="carousel-caption d-none d-md-block">
+                <h2>And visuaize your data in multiple customizable charts</h2>
+                <p>Charts still in progree</p>
+            </div>
+        </div>
+    </div>
+    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+
+
+
+</div>
+    <center>
+        <button class="btn btn-info" onclick="location.href='{{ url_for('auth_bp.login') }}'">
+            <i class="fas fa-sign-in-alt"></i>
+            Login
+        </button>
+        <button class="btn btn-info" onclick="location.href='{{ url_for('auth_bp.signup') }}'">
+            <i class="far fa-user"></i>
+            Sign in
+        </button>
+    </center>
+</div>
+
+
+
+<script>
+    console.log('home');
+</script>
+{% endblock %}

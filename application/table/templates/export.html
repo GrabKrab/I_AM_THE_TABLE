@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div>
+    <center>
+        <h3>Select table to download</h3>
+    </center>
+    <Form method="post" action="export_table">
+    {% for t_name in tables %}
+    <ul>
+        <li>
+            <input type="radio" id="{{ t_name }}" name="to_export" value="{{ t_name }}">
+            <label for="{{ t_name }}">{{ t_name }}</label>
+        </li>
+    </ul>
+    {% endfor %}
+    <button class="btn btn-info" type="submit">Export</button>
+    </Form>
+
+</div>
+
+
+
+{% endblock %}

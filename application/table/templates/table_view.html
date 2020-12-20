@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+{% block title %}Data{% endblock %}
+
+{% block content %}
+
+<!-- Main table Name and options-->
+<div class="mycontainer">
+
+<!--  NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item dropdown">
+        <button type="button" class="btn btn-light dropdown-toggle border" id="NameDropdown" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false" data-reference="parent">
+        {{ tablename }}</button>
+        <div class="dropdown-menu" aria-labelledby="NamedDropdown">
+          <a class="dropdown-item" data-toggle="modal" data-target="#renametable" data-whatever="{{tablename}}">
+            Rename Table
+          </a>
+  <!--      Dorzuć Modala z ADD DESRIPTION-->
+          <a class="dropdown-item" data-toggle="modal" data-target="#renametable" data-whatever="{{tablename}}">
+            Add description
+          </a>
+        </div>
+      </li>
+
+      <li class="nav-item dropdown">
+        <button type="button" class="btn btn-light dropdown-toggle border" id="ViewsDropdown" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false" data-reference="parent">
+          Views
+        </button>
+        <div class="dropdown-menu" aria-labelledby="ViewsDropdown">
+          <a class="dropdown-item" href="{{ url_for('table_bp.table_view', tablename=tablename) }}"><i class="fas fa-table"></i> Table</a>
+          <a class="dropdown-item" href="#"><i class="fas fa-chart-pie"></i> Charts</a>
+          <a class="dropdown-item" href="#"><i class="fas fa-stream"></i> Timeline</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item text-primary" href="#">+ Add View</a>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <button type="button" class="btn btn-ligh border" name="filter" value="{{col}}"
+          data-toggle="modal" data-target="#filter" data-whatever="{{col}}">
+      <i class="fas fa-filter"></i> Filter</button>
+      </li>
+    </ul>
+
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fa fa-search"></i></button>
+    </form>
+
+  </div>
+</nav>
+<!--END OF NAVIGATION -->
+
+<hr>
+
+<!--TABLE DIV-->
+<div class="tablediv">
+  <div class="card-header card-header-primary">
+    <h4 class="card-title" onmouseover="toggleEditButtonVis('editTableName')" onmouseleave="toggleEditButtonHid('editTableName')"
+        data-toggle="modal" data-target="#renametable" data-whatever="{{tablename}}">
+      {{ tablename }}
+      <i class="fas fa-pen" id="editTableName" hidden="true"></i></h4>
+
+    <p class="card-category" onmouseover="toggleEditButtonVis('editTableDescr')" onmouseleave="toggleEditButtonHid('editTableDescr')"
+       data-toggle="modal" data-target="#renametable" data-whatever="{{tablename}}">
+      {{ tableDesc }}
+      <i class="fas fa-pen" id="editTableDescr" hidden="true"></i>
+    </p>
+  </div>
+    <div class="gridTable">
+<!--          TABLE -->
+      <table class="table-hover bg-white table" style="border: 1px solid #cccccc;">
+        <thead class="text-primary">
+<!--            first column in table head-->
+          <th  class="bg-light thinnest-column">
+            <form action="sort_data" method="post">
+              <button type="submit" class="btn btn-light btn-sm" name="sort" value="index" data-toggle="tooltip" data-placement="top" title="Sort by index">#</button>
+            </form>
+          </th>
+
+          {% for col in datafr %}
+
+          <th scope="col" class="bg-light">
+<!--        Sort Column  -->
+            <div class="btn-group align-middle">
+              <form action="sort_data" method="post">
+                <button type="submit" class="btn btn-light btn-sm" name="sort" value="{{ col }}" data-toggle="tooltip" data-placement="top" title="Sort by {{col}}">
+                  {{ col }}
+                </button>
+              </form>
+              {% if column_descr[col] %}
+              <button class="btn btn-light btn-sm" type="button" data-toggle="tooltip" data-placement="top" title="{{column_descr[col]}}">
+                <i class="far fa-question-circle"></i></button>
+              {% endif %}
+<!--            Dropdown Menu-->
+
+              <button type="button" class="btn btn-light btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <div class="dropdown-menu">
+<!--              Edit column name (title)-->
+                <form action="edit_title" method="post">
+                  <button type="button" class="dropdown-item" name="edit_title" value="{{col}}"
+                          data-toggle="modal" data-target="#edittitle" data-whatever="{{col}}">
+                    <i class="fas fa-pen"></i> Edit title</button>
+                </form>
+  <!--              Add column description-->
+                <form action="add_descr" method="post">
+                  <button type="button" class="dropdown-item" name="adddescription" value="{{col}}"
+                          data-toggle="modal" data-target="#adddescription" data-col="{{col}}" data-desc="{{column_descr[col]}}">
+                    <i class="fas fa-question-circle"></i> Add description</button>
+                </form>
+                <div class="dropdown-divider"></div>
+
+  <!--              Edit column preferences-->
+                <form action="edit_prefs" method="post">
+                  <button type="button" class="dropdown-item" name="prefs" value="{{col}}"
+                          data-toggle="modal" data-target="#edittitle" data-whatever="{{col}}">
+                    <i class="fas fa-cog"></i> Edit Preferences</button>
+                </form>
+                <div class="dropdown-divider"></div>
+
+<!--              LEFT RIGHT-->
+                <form action="move_column" method="post">
+                  <button type="submit" class="dropdown-item" name="move" value="-1,{{col}}">
+                    <i class="fas fa-arrow-left"></i> Move left</button>
+                  <button type="submit" class="dropdown-item" name="move" value="1,{{col}}">
+                    <i class="fas fa-arrow-right"></i> Move right</button>
+                </form>
+                <div class="dropdown-divider"></div>
+  <!--              Add column to the right-->
+                <button type="submit" class="dropdown-item" name="add_to_right" value=""><i class="fas fa-plus-circle"></i> Add column to the right </button>
+
+                <div class="dropdown-divider"></div>
+  <!--              Delete column-->
+                <form action="del_column" method="post">
+                  <button type="button" class="dropdown-item" name="delete" value="{{col}}"
+                          data-toggle="modal" data-target="#confirmation" data-whatever="{{col}}">
+                    <i class="fas fa-trash-alt"></i> Delete column</button>
+                </form>
+              </div>
+            </div>
+          </th>
+
+            {% endfor %}
+<!-- last column is a menu with add column options -->
+          <th scope="col" class="btn-light thinnest-column">
+            <div class="btn-group">
+              <button type="button" class="btn btn-light btn-sm dropdown-toggle dropdown-toggle-split" id="addColumnMenu"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
+                <i class="fas fa-plus-circle"></i>
+<!--            <span class="sr-only">Blelele</span>-->
+              </button>
+              <div class="dropdown-menu" aria-labelledby="addColumnMenu">
+                <form action="add_column" method="post">
+                  <button type="button" class="dropdown-item" name="add_column" value="object"
+                        data-toggle="modal" data-target="#addcolumn" data-whatever="Text"><i class="fas fa-font"></i> Text</button>
+                  <button type="button" class="dropdown-item" name="add_column" value="float64"
+                        data-toggle="modal" data-target="#addcolumn" data-whatever="Number"><i class="fas fa-calculator"></i> Number</button>
+                  <button type="button" class="dropdown-item" name="add_column" value="object"
+                        data-toggle="modal" data-target="#addcolumn" data-whatever="Status"><i class="fas fa-align-justify"></i> Status</button>
+                  <button type="button" class="dropdown-item" name="add_column" value="object"
+                        data-toggle="modal" data-target="#addcolumn" data-whatever="Priority"><i class="fas fa-align-justify"></i> Priority</button>
+                  <button type="button" class="dropdown-item" name="add_column" value="datetime64"
+                        data-toggle="modal" data-target="#addcolumn" data-whatever="Date"><i class="fas fa-calendar-alt"></i> Date</button>
+                  <button type="button" class="dropdown-item" name="add_column" value="timedelta"
+                        data-toggle="modal" data-target="#addcolumn" data-whatever="Timeline"><i class="fas fa-stream"></i> Timeline</button>
+                </form>
+              </div>
+            </div>
+          </th>
+        </thead>
+        <tbody>
+          <form action="" method="post">
+            {% for indx, row in index|zip(datafr.values) %}
+            <tr>
+              {% if row_sel %}
+              <td scope="row">
+                <input type="checkbox" name="{{ indx }}" value="{{ indx }}">
+              </td>
+              {% else %}
+                <td scope="row"><p>{{ indx }}</p></td>
+              {% endif %}
+
+              {% for col,col_d in datafr.columns|zip(column_type) %}
+  <!--      Rows with values-->
+  <!--      Editable w zależności od rodzaju wnikającego z "column_type" -->
+  <!--      Depending on "column_type" (desription) opens proper modal for cell editing -->
+
+              {% if col_d == 'Text' %}
+              <td class="editcell text" data-toggle="modal" data-target="#editcellT"
+                 data-val="{{ datafr[col][indx] }}" data-col="{{col}}" data-ind="{{indx}}">
+                <p style="font-size: 14px" c>{{datafr[col][indx]}}</p>
+              </td>
+              {% elif col_d == 'Number' %}
+              <td class="text-right" data-toggle="modal" data-target="#editcellN"
+                 data-val="{{ datafr[col][indx] }}" data-col="{{col}}" data-ind="{{indx}}">
+                <p style="font-size: 14px">{{datafr[col][indx]}}</p>
+              </td>
+              {% elif col_d == 'Status' %}
+              <td class="{{status_types[datafr[col][indx]]}} text-center rounded" data-toggle="modal" data-target="#editcellS"
+                 data-val="{{ datafr[col][indx] }}" data-col="{{col}}" data-ind="{{indx}}" data-types="status_types">
+                <p style="font-size: 14px">{{datafr[col][indx]}}</p>
+              </td>
+              {% elif col_d == 'Priority' %}
+              <td class="{{priority_types[datafr[col][indx]]}} text-center rounded" data-toggle="modal" data-target="#editcellP"
+                 data-val="{{ datafr[col][indx] }}" data-col="{{col}}" data-ind="{{indx}}">
+                <p style="font-size: 14px">{{datafr[col][indx]}}</p>
+              </td>
+              {% elif col_d == 'Date' %}
+              <td class="{{priority_types[datafr[col][indx]]}} text-center" data-toggle="modal" data-target="#editcellD"
+                 data-val="{{ datafr[col][indx] }}" data-col="{{col}}" data-ind="{{indx}}">
+                <p style="font-size: 14px"><time datetime="{{datafr[col][indx]}}">{{datafr[col][indx]}}</time></p>
+              </td>
+              {% elif col_d == 'Timeline' %}
+              <td class="{{priority_types[datafr[col][indx]]}} text-center" data-toggle="modal" data-target="#editcellT"
+                 data-val="{{ datafr[col][indx] }}" data-col="{{col}}" data-ind="{{indx}}">
+                <p style="font-size: 14px"><time datetime="{{datafr[col][indx]}}">{{datafr[col][indx]}}</time></p>
+              </td>
+
+              {% endif %}
+              {% endfor %}
+              <td></td>
+            </tr>
+            {% endfor %}
+            {% if row_sel %}
+              <input type="submit" value="Delete Row">
+              <input type="button" id="selectlAll" name="SelAll" value="select All">
+            {% endif %}
+          </form>
+        </tbody>
+
+      </table>
+<!--          ADD NEW ROW BUTTON -->
+      <form action="add_row" method="post">
+        <button type="submit" class="btn btn-light btn-sm border border-primary"><i class="fas fa-plus-circle"></i> Add Row</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- MODALS -->
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmation" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ... text replaced in js ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="del_column" method="post">
+          <button type="submit" class="btn btn-primary" name="delete" value="column">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Adding Column Modal -->
+<div class="modal fade" id="addcolumn" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalLabel">Enter column name</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="add_column" method="post">
+          <input type="text" class="col_name" name="col_name" value="New Column">
+          <button type="submit" class="dtype btn btn-primary" name="dtype" value="c">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rename Column Modal EDIT TITLE-->
+<div class="modal fade" id="edittitle" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="RenameModalLabel">Enter new column name</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="edit_col_title" method="post">
+          <input class="new_name" type="text" name="new_name" value="old name">
+          <button type="submit" class="btn btn-primary" name="old_name" value="col">Rename</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add description Modal-->
+<div class="modal fade" id="adddescription" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="DescrModalLabel">Enter new column name</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="add_description" method="post">
+          <textarea class="description" name="description"></textarea>
+          <button type="submit" class="btn btn-primary" name="column" value="col">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--EDIT CELL MODALS-->
+<!--Edit cell TEXT Modal-->
+<div class="modal fade" id="editcellT" tabindex="-1" aria-labelledby="editcellModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editcellModalLabel">Enter text</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="edit_cell" method="post">
+          <input type="text" class="new_value" name="new_value" value="">
+          <input type="hidden" class="forindx" name="indx" value="indx">
+          <input type="hidden" class="forcol" name="col" value="col">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Edit cell NUMBER Modal-->
+<div class="modal fade" id="editcellN" tabindex="-1" aria-labelledby="editcellModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editcellNModalLabel">Enter text</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="edit_cell" method="post">
+          <input type="text" class="new_value" name="new_number" value="0">
+          <input type="hidden" class="forindx" name="indx" value="indx">
+          <input type="hidden" class="forcol" name="col" value="col">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--Edit cell Status Modal-->
+<div class="modal fade" id="editcellS" tabindex="-1" aria-labelledby="editstatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+        <div class="modal-body">
+          <form action="edit_cell" method="post">
+            <div class="btn-group btn-group-vertical w-100" role="group">
+              {% for key, val in status_types.keys()|zip(status_types.values()) %}
+                <button type="submit" class="btn {{val}} border-dark mb-1" name="new_value" value="{{key}}">{{key}}</button>
+                <input type="hidden" class="forindx" name="indx" value="indx">
+                <input type="hidden" class="forcol" name="col" value="col">
+              {% endfor %}
+              <hr>
+              <button type="button" class="btn btn-link"><i class="fas fa-pen"></i> Edit Labels</button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!--Edit cell Priority Modal-->
+<div class="modal" id="editcellP" tabindex="-1" aria-labelledby="editstatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+        <div class="modal-body">
+          <form action="edit_cell" method="post">
+            <div class="btn-group btn-group-vertical w-100" role="group">
+              {% for key, val in priority_types.keys()|zip(priority_types.values()) %}
+                <button type="submit" class="btn {{val}} border-dark mb-1" name="new_value" value="{{key}}">{{key}}</button>
+                <input type="hidden" class="forindx" name="indx" value="indx">
+                <input type="hidden" class="forcol" name="col" value="col">
+              {% endfor %}
+              <hr>
+              <button type="button" class="btn btn-link"><i class="fas fa-pen"></i> Edit Labels</button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!--Edit cell DATE Modal-->
+<div class="modal fade" id="editcellD" tabindex="-1" aria-labelledby="editstatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+        <div class="modal-body">
+          <form action="edit_cell" method="post">
+            <div class="btn-group btn-group-vertical w-100" role="group">
+              <input type="date" name="new_value"   >
+              <input type="hidden" class="forindx" name="indx" value="indx">
+              <input type="hidden" class="forcol" name="col" value="col">
+              <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Rename Table Modal -->
+<div class="modal fade" id="renametable" tabindex="-1" aria-labelledby="RenameTableLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="RenameTableLabel">Enter new table name</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="rename_table" method="post">
+          <input class="new_name" type="text" name="new_name" value="old name">
+          <input class="old_name" type="hidden" name="old_name" value="old name">
+          <button type="submit" class="btn btn-primary">Rename</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

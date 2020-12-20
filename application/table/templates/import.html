@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<!--<div>-->
+<!--    <center>-->
+
+
+<!--    <h1>File Upload</h1>-->
+<!--    <form action="{{ url_for('table_bp.import_table') }}" class="dropzone">-->
+<!--            <button type="submit" class="menu-item menu-item-sm">-->
+<!--                Import Table-->
+<!--            </button>-->
+<!--    </form>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>-->
+
+<!--    </center>-->
+<!--</div>-->
+
+
+
+<div>
+    <center>
+        <h3>Import a csv or xls file:</h3>
+        <form action="import_table" method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button type="submit" class="menu-item menu-item-sm">
+                Import Table
+            </button>
+        </form>
+    </center>
+</div>
+
+<form class="box" method="post" action="" enctype="multipart/form-data">
+  <div class="box__input">
+    <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+    <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
+    <button class="box__button" type="submit">Upload</button>
+  </div>
+  <div class="box__uploading">Uploading…</div>
+  <div class="box__success">Done!</div>
+  <div class="box__error">Error! <span></span>.</div>
+</form>
+
+
+
+<script>
+    console.log('import');
+</script>
+{% endblock %}

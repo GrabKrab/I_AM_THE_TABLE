@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}AddRow{% endblock %}
+
+{% block content %}
+
+<label>Column Index</label>
+
+<form action="" method="post">
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        {% for col in form.cols %}
+          <th scope="col">{{ col }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for col in form.cols %}
+          <td scope="row">
+              <input type="text" name="{{ col }}" value="">
+          </td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-info">Add Row</button>
+</form>
+
+{% endblock %}
